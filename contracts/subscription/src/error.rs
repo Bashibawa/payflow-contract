@@ -47,4 +47,7 @@ pub enum Error {
     /// upgrade: the mandate's merchant decides who is paid and who may
     /// refund.
     DifferentMerchant = 17,
+    /// The seat count passed to `set_seats` is zero. A seat count must be at
+    /// least 1 when explicitly set.
+    InvalidSeats = 18,
 }

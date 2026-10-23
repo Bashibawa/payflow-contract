@@ -8,6 +8,7 @@
 
 #![no_std]
 #![deny(missing_docs)]
+#![forbid(unsafe_code)]
 
 #[allow(missing_docs)]
 mod error;

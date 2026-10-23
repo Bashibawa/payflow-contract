@@ -7,9 +7,38 @@ change the contract interface.
 
 ## Unreleased
 
+### Security
+
+- **contracts:** add `#![forbid(unsafe_code)]` to every contract crate
+  (`plan-registry`, `vault`, `subscription`). Any attempt to introduce an
+  `unsafe` block now fails the build immediately. No interface or event changes.
+  Closes #97.
+
 ### Added
 
-- **contracts:** expose `version()` on the subscription, plan-registry and vault
+- **subscription:** `set_seats(subscriber, mandate_id, seats)` lets the
+  subscriber change the seat count on an active mandate. The new count is stored
+  in `Mandate.seats` and takes effect from the next charge; no proration is
+  applied. Only the subscriber may call it, the mandate must be active (not
+  cancelled or completed), and `seats` must be at least 1, otherwise the call
+  fails with the new `InvalidSeats` error (code 18). Emits the new `SeatsChanged`
+  event (topics `mandate_id`, `subscriber`; data `old_seats`, `new_seats`) and a
+  `MandateUpdated` snapshot. `Mandate` gains the `seats` field (0 for flat-rate
+  mandates that were opened before this change or that do not use seat-based
+  pricing). This is an interface change: `payflow-backend`, `payflow-frontend`
+  and `payflow-docs` need to read the new `Mandate.seats` field, handle the new
+  `seats_changed` event, and map the new error code. Closes #93.
+
+### Changed
+
+- **subscription:** `Mandate` gains a `seats: u32` field, defaulting to `0` for
+  mandates that are not seat-based or opened before this change. This is a
+  breaking storage change: existing deployed mandates do not contain the new
+  field and will fail to decode on deployments that have not been redeployed.
+  `payflow-backend`, `payflow-frontend` and `payflow-docs` need downstream
+  updates.
+
+
   contracts so clients can identify the deployed crate version. This interface
   addition needs handling in payflow-backend, payflow-frontend and payflow-docs.
   Closes #66.
