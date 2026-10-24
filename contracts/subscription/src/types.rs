@@ -84,12 +84,11 @@ pub struct Mandate {
     /// merchant can never refund more than it has collected, so this counter
     /// is the hard cap `refund` enforces.
     pub refunded: i128,
+    /// Number of seats the subscriber is paying for. `1` for non-seat plans.
+    /// `amount` already equals the per-seat price multiplied by this value.
+    pub seats: u32,
     /// Current lifecycle state of the mandate.
     pub status: MandateStatus,
-    /// Number of seats included in this mandate. 0 means not seat-based.
-    /// Only meaningful when the plan is seat-based; for flat-rate plans this
-    /// field is always 0. The subscriber may change it via `set_seats`.
-    pub seats: u32,
 }
 
 /// Storage keys used by the subscription contract.

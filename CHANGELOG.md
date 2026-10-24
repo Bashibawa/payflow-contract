@@ -7,14 +7,14 @@ change the contract interface.
 
 ## Unreleased
 
+### Added
+
 ### Security
 
 - **contracts:** add `#![forbid(unsafe_code)]` to every contract crate
   (`plan-registry`, `vault`, `subscription`). Any attempt to introduce an
   `unsafe` block now fails the build immediately. No interface or event changes.
   Closes #97.
-
-### Added
 
 - **subscription:** `set_seats(subscriber, mandate_id, seats)` lets the
   subscriber change the seat count on an active mandate. The new count is stored
@@ -38,7 +38,12 @@ change the contract interface.
   `payflow-backend`, `payflow-frontend` and `payflow-docs` need downstream
   updates.
 
+- **tests:** the subscription, vault and plan-registry suites will assert the
+  exact `env.auths()` tree for every state-changing function, and each mutating
+  function gains a negative test using `mock_auths` with the wrong signer. No
+  interface, event or error changes. Closes the auth-tree test issue.
 
+- **contracts:** expose `version()` on the subscription, plan-registry and vault
   contracts so clients can identify the deployed crate version. This interface
   addition needs handling in payflow-backend, payflow-frontend and payflow-docs.
   Closes #66.
@@ -91,6 +96,14 @@ change the contract interface.
   behind it are written up in [ADR 0006](docs/adr/0006-prorated-upgrade-charging.md).
   payflow-backend, payflow-frontend and payflow-docs need the new
   `subscription_upgraded` event and the new error codes. Closes #94.
+
+- **subscription:** `estimated_end(mandate_id)` returns the projected final
+  charge timestamp for capped mandates using the current `next_charge` schedule,
+  including drift after late charges. It returns `None` for open-ended mandates
+  and the actual final charge timestamp after completion. This read interface
+  addition needs handling in payflow-backend, payflow-frontend and payflow-docs;
+  payflow-docs also needs a message for the new `ScheduleOverflow` error. Closes
+  #105.
 
 ### Changed
 
